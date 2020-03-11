@@ -1,0 +1,9 @@
+{% extends "base.html"%}
+
+{% block content%}
+<h1>This are the available items</h1>
+
+{%for item in items%}
+{{item}}
+{%endfor%}
+{%endblock content%}
