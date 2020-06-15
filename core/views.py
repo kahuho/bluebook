@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from .models import Item, Order, OrderItem
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 def home(request):
@@ -37,18 +39,39 @@ class ItemView(DetailView):
 # adding items to cart
 
 
-def add_to_cart(requets, slug):
+def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
-    order_item, created = OrderItem.objects.get_or_create(
-        item=item, user=request.user, ordered=False)
+    order_item, created = OrderItem.objects.get_or_create(item=item,
+                                                          user=request.user, ordered=False)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
     if order_qs.exists():
-        order_item = order_qs[0]
+        order = order_qs[0]
         # confirm whether item alreday exists in order
         if order.items.filter(item__slug=item.slug). exists():
             order_item.quantity += 1
             order_item.save()
         else:
-            order = Order.objects.create(user=requet.user)
             order.items.add(order_item)
+    else:
+        ordered_date = timezone.now()
+        order = Order.objects.create(
+            user=request.user, ordered_date=ordered_date)
+        order.items.add(order_item)
+    return redirect("core:product", slug=slug)
+# removing items from the cart
+
+
+def remove_from_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+    # confirm whether item alreday exists in order
+        if order.items.filter(item__slug=item.slug). exists():
+            order_item = OrderItem.objects.filter(item=item,
+                                                  user=request.user, ordered=False)[0]
+            order.items.remove(order_item)
+    else:
+            # add message order doesnt exisst
         return redirect("core:product", slug=slug)
+    return redirect("core:product", slug=slug)
