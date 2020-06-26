@@ -29,6 +29,7 @@ def products(request):
 
 class HomeView(ListView):
     model = Item
+    paginate_by = 8
     template_name = "home-page.html"
     # detailed view of single item
 
