@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from django.views.generic import ListView, DetailView
+from django.core.exceptions import ObjectDoesNotExist
+from django.views.generic import ListView, DetailView, View
 from .models import Item, Order, OrderItem
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -39,6 +40,16 @@ class ItemView(DetailView):
     template_name = "product-page.html"
 
 # adding items to cart
+
+
+class OrderSummary(View):
+    def get(self, * args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            return render(self.request, 'order_summary.html')
+        except ObjectDoesNotExist:
+            messages.error(self.request, "You do not have an active order")
+            return redirect("/")
 
 
 def add_to_cart(request, slug):

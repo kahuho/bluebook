@@ -1,8 +1,10 @@
 {% load static %}
+{%load cart_template_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -56,7 +58,7 @@
           {%if request.user.is_authenticated%}
           <li class="nav-item">
             <a class="nav-link waves-effect">
-              <span class="badge red z-depth-1 mr-1"> 1 </span>
+              <span class="badge red z-depth-1 mr-1"> {{request.user| cart_item_count}}</span>
               <i class="fas fa-shopping-cart"></i>
               <span class="clearfix d-none d-sm-inline-block"> Cart </span>
             </a>
