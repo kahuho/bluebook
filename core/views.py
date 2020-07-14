@@ -4,6 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, DetailView, View
 from .models import Item, Order, OrderItem
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from django.utils import timezone
 from django.contrib import messages
 
@@ -42,16 +44,20 @@ class ItemView(DetailView):
 # adding items to cart
 
 
-class OrderSummary(View):
+class OrderSummary(LoginRequiredMixin, View):
     def get(self, * args, **kwargs):
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
-            return render(self.request, 'order_summary.html')
+            context = {
+                'object': order
+
+            }
+            return render(self.request, 'order_summary.html', context)
         except ObjectDoesNotExist:
             messages.error(self.request, "You do not have an active order")
             return redirect("/")
 
-
+@login_required
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(item=item,
@@ -78,7 +84,7 @@ def add_to_cart(request, slug):
 
 # removing items from the cart
 
-
+@login_required
 def remove_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
