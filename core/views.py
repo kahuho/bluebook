@@ -70,16 +70,17 @@ def add_to_cart(request, slug):
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "Item quanity was updated")
-
+            return redirect("core:order_summary")
         else:
             order.items.add(order_item)
             messages.info(request, "Item succcesfully added to your cart")
+            return redirect("core:order_summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
             user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
-    return redirect("core:product", slug=slug)
+    return redirect("core:order_summary")
 
 
 # removing items from the cart
@@ -96,12 +97,42 @@ def remove_from_cart(request, slug):
                                                   user=request.user, ordered=False)[0]
             order.items.remove(order_item)
             messages.warning(request, "Item removed from your cart")
+            return redirect("core:order_summary")
+
 
         else:
             # add message order doesnt exist
             messages.info(request, "Item does not exists in your cart")
-            return redirect("core:product", slug=slug)
+            return redirect("core:order_summary")
     else:
         messages.info(request, "You do not have an active order yet")
         return redirect("core:product")
-    return redirect("core:product", slug=slug)
+
+# romove single item from order summary
+@login_required
+def remove_single_item_from_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+    # confirm whether item alreday exists in order
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item = OrderItem.objects.filter(item=item,
+                                                  user=request.user, ordered=False)[0]
+            if order_item.quantity > 1:
+                order_item.quantity -= 1
+                order_item.save()
+            else:
+                order.items.remove(order_item)
+
+            messages.warning(request, "Item quantity was updated")
+            return redirect("core:order_summary")
+
+
+        else:
+            # add message order doesnt exist
+            messages.info(request, "Item does not exists in your cart")
+            return redirect("core:order_summary")
+    else:
+        messages.info(request, "You do not have an active order yet")
+        return redirect("core:product")
