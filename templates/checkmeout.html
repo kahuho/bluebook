@@ -42,7 +42,7 @@
 
 
                         <!--Card content-->
-                        <form class="card-body">
+                        <form method="post" class="card-body">
                         {% csrf_token %}
 
 
@@ -75,7 +75,7 @@
                                 <!--Grid column-->
                                 <div class="col-lg-4 col-md-6 mb-4">
 
-                                    <label for="state">State</label>
+                                    <label for="state">County</label>
                                     <select class="custom-select d-block w-100" id="state" required>
                                         <option value="">Choose...</option>
                                         <option>California</option>
@@ -124,7 +124,7 @@
                             <div class="d-block my-3">
                             {% for value, name in form.fields.payment_options.choices %}
                                 <div class="custom-control custom-radio">
-                                    <input id="{{name}}" name="paymentMethod" type="radio" class="custom-control-input"
+                                    <input id="{{name}}" name="payment_options" value="{{ value }}" type="radio" class="custom-control-input"
                                         required>
                                     <label class="custom-control-label" for="{{name}}">{{ name }}</label>
                                 </div>

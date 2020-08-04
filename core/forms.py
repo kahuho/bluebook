@@ -6,8 +6,8 @@ PAYMENT_OPTIONS = (
     ('P', 'Paypal')
 )
 class CheckoutForm(forms.Form):
-    street_address = forms.CharField( widget=forms.TextInput(attrs= {'placeholder': 'lumumba drive'}))
-    apartment = forms.CharField(widget=forms.TextInput(attrs= {'placeholder': 'apartment or suite'}), required=False)
+    street_address = forms.CharField( widget=forms.TextInput(attrs= {'placeholder': 'lumumba drive', 'class': 'form-control'}))
+    apartment = forms.CharField(widget=forms.TextInput(attrs= {'placeholder': 'apartment or suite', 'class': 'form-control'}), required=False)
     country = CountryField(blank_label='select country').formfield()
     zip = forms.CharField()
     same_billing_address = forms.BooleanField(required=False)
