@@ -5,7 +5,7 @@ from django.views.generic import ListView, DetailView, View
 from .models import Item, Order, OrderItem
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .forms import CheckoutForm
 from django.utils import timezone
 from django.contrib import messages
 
@@ -18,8 +18,21 @@ def home(request):
 # checkout page view
 
 
-def checkout(request):
-    return render(request, "checkmeout.html")
+class CheckoutView(View):
+    def get (self, *args, **kwargs):
+        form = CheckoutForm()
+        context = {
+            'form': form
+        }
+        return render(self.request, "checkmeout.html", context)
+    def post (self, *args, **kwargs):
+        form = CheckoutForm()
+        if form.is_valid():
+            form.save()
+            return redirect('core:checkout')
+
+
+
 # products page view
 
 
